@@ -10,7 +10,7 @@
 
     <devices>
         <device name="LEDs" type="Adafruit NeoPixel">
-            <setting id="pin" value="4"/>
+            <setting id="pin" value="5"/>
             <setting id="npixels" value="7"/>
         </device>
         <device name="Mode Switch" type="Debounced Input">
