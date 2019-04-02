@@ -86,10 +86,31 @@ static bool compare_buttons(char const * const to_match)
 
 void raat_custom_setup(const raat_devices_struct& devices, const raat_params_struct& params)
 {
-    (void)devices;
     (void)params;
 
-    //TODO: LED test
+    for(uint8_t i=0; i<7; i++)
+    {
+        devices.pLEDs->setPixelColor(i, 128,0,0);
+        devices.pLEDs->show();
+        delay(100);
+    } 
+
+    for(uint8_t i=0; i<7; i++)
+    {
+        devices.pLEDs->setPixelColor(i, 0,128,0);
+        devices.pLEDs->show();
+        delay(100);
+    } 
+
+    for(uint8_t i=0; i<7; i++)
+    {
+        devices.pLEDs->setPixelColor(i, 0,0,128);
+        devices.pLEDs->show();
+        delay(100);
+    }
+
+    devices.pLEDs->clear();
+    devices.pLEDs->show();
 }
 
 void raat_custom_loop(const raat_devices_struct& devices, const raat_params_struct& params)
