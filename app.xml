@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<board type="Arduino Nano" name="app">
+    <info>
+        Astral Plane Prop for Cryptology
+    </info>
+
+    <defines>
+    </defines>
+
+    <devices>
+        <device name="LEDs" type="Adafruit NeoPixel">
+            <setting id="pin" value="4"/>
+            <setting id="npixels" value="7"/>
+        </device>
+        <device name="Mode Switch" type="Debounced Input">
+            <setting id="pin" value="A0"/>
+            <setting id="debounce_time" value="50"/>
+            <setting id="pullup" value="true"/>
+        </device>
+        <device name="Buttons" type="Debounced Input" count="7">
+            <setting id="pin" values="6|7|8|9|10|11|12"/>
+            <setting id="debounce_time" all_values="50"/>
+            <setting id="pullup" all_values="true"/>
+        </device>
+        <device name="Maglock" type="Digital Output">
+            <setting id="pin" value="2"/>
+        </device>
+        <device name="Heartbeat" type="Timed OnOff">
+            <setting id="pin" value="13"/>
+            <setting id="ontime" value="500"/>
+            <setting id="offtime" value="500"/>
+        </device>
+    </devices>
+
+    <parameters>
+        <parameter name="ButtonOrder" type="String">
+            <setting id="reset_value" value="1234567"/>
+            <setting id="length" value="7"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
+    </parameters>
+
+    <modules>
+    </modules>
+
+    <custom_code>
+        <file>application.cpp</file>
+    </custom_code>
+    
+    <logging>
+        <log_module>APPLICATION</log_module>
+    </logging>
+
+    <raat protocol="url" buffer_size="32">
+    </raat>
+    
+</board>
