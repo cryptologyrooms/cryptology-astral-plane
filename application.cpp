@@ -51,7 +51,7 @@ static void update_buttons(DebouncedInput * const pButtons[N_BUTTONS])
     if ((button_count == 1) && (s_press_count < N_BUTTONS))
     {
         s_press_record[s_press_count++] = button_pressed;
-        raat_logln(LOG_APP, "Button %c pressed", button_pressed);
+        raat_logln(LOG_APP, "Button %c pressed (count %d)", button_pressed, s_press_count);
     } 
 }
 
@@ -116,13 +116,16 @@ void raat_custom_loop(const raat_devices_struct& devices, const raat_params_stru
             memset(s_press_record, '0', N_BUTTONS);
             memset(s_pressed, false, N_BUTTONS);
             s_press_count = 0;
-            leds_fail(devices.pLEDs, s_mode);
+            leds_fail(devices.pLEDs);
         }
     }
 
     if (s_press_count == N_BUTTONS)
     {
-        //TODO: leds_success(s_mode);
+        leds_success(devices.pLEDs);
+        devices.pMaglock->set(true);
+        while(true) {}
     }
+
     leds_update(devices.pLEDs, s_mode, s_press_count);
 }

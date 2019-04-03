@@ -9,6 +9,26 @@
 #include "application.h"
 #include "leds.h"
 
+static void flash_leds(
+    AdafruitNeoPixelRAAT * pLEDs, uint8_t r, uint8_t g, uint8_t b,
+    uint16_t ms_delay, uint8_t count)
+{
+    pLEDs->clear();
+    pLEDs->show();
+    delay(ms_delay);
+    
+    for (uint8_t i=0; i<count; i++)
+    {
+        pLEDs->set_pixels(0, 6, r, g, b);
+        pLEDs->show();
+        delay(ms_delay);
+        pLEDs->clear();
+        pLEDs->show();
+        delay(ms_delay);
+    }
+
+}
+
 void leds_play_intro(AdafruitNeoPixelRAAT * pLEDs)
 {
     for(uint8_t i=0; i<7; i++)
@@ -37,22 +57,9 @@ void leds_play_intro(AdafruitNeoPixelRAAT * pLEDs)
 
 }
 
-void leds_fail(AdafruitNeoPixelRAAT * pLEDs, GAME_MODE mode)
+void leds_fail(AdafruitNeoPixelRAAT * pLEDs)
 {
-    if (mode == GAME_MODE_EXPERT)
-    {
-        pLEDs->set_pixels(0, 6, 96, 0, 0);
-        pLEDs->show();
-        delay(250);
-        pLEDs->set_pixels(0, 6, 0, 0, 0);
-        pLEDs->show();
-        delay(250);
-        pLEDs->set_pixels(0, 6, 96, 0, 0);
-        pLEDs->show();
-        delay(250);
-        pLEDs->set_pixels(0, 6, 0, 0, 0);
-        pLEDs->show();
-    }
+    flash_leds(pLEDs, 96, 0, 0, 500, 1);
 }
 
 void leds_update(AdafruitNeoPixelRAAT * pLEDs, GAME_MODE mode, uint8_t press_count)
@@ -70,4 +77,9 @@ void leds_update(AdafruitNeoPixelRAAT * pLEDs, GAME_MODE mode, uint8_t press_cou
         }       
     }
     pLEDs->show();
+}
+
+void leds_success(AdafruitNeoPixelRAAT * pLEDs)
+{
+    flash_leds(pLEDs, 0, 96, 0, 500, 1);
 }
