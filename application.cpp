@@ -26,7 +26,7 @@ typedef enum game_mode
 
 static char s_press_record[N_BUTTONS+1] = "0000000";
 
-static uint8_t s_press_index = 0;
+static uint8_t s_press_count = 0;
 
 static GAME_MODE s_mode = (GAME_MODE)-1;
 
@@ -46,9 +46,10 @@ static void update_buttons(DebouncedInput * const pButtons[N_BUTTONS])
         }
     }
 
-    if ((button_count == 1) && (s_press_index < N_BUTTONS))
+    if ((button_count == 1) && (s_press_count < N_BUTTONS))
     {
-        s_press_record[s_press_index++] = button_pressed;
+        s_press_record[s_press_count++] = button_pressed;
+        raat_logln(LOG_APP, "Button %c pressed", button_pressed);
     } 
 }
 
@@ -72,7 +73,7 @@ static void update_mode(DebouncedInput * const pModeSwitch)
 
 static bool compare_buttons(char const * const to_match)
 {
-    for (uint8_t i = 0; i<s_press_index; i++)
+    for (uint8_t i = 0; i<s_press_count; i++)
     {
         if (to_match[i] != s_press_record[i])
         {
@@ -123,24 +124,24 @@ void raat_custom_loop(const raat_devices_struct& devices, const raat_params_stru
    
     uint8_t check_threshold = s_mode == GAME_MODE_EASY ? 3 : 6;
 
-    if (s_press_index >= check_threshold)
+    if (s_press_count >= check_threshold)
     {
         bool match_result = compare_buttons(to_match);
         if (!match_result)
         {
             raat_logln(LOG_APP, "Incorrect press %c (expected %c)",
-                s_press_record[s_press_index],
-                to_match[s_press_index]
+                s_press_record[s_press_count-1],
+                to_match[s_press_count-1]
             );
             memset(s_press_record, '0', N_BUTTONS);
-            s_press_index = 0;
+            s_press_count = 0;
             //TODO: fail_leds(s_mode);
         }
     }
 
-    if (s_press_index == N_BUTTONS)
+    if (s_press_count == N_BUTTONS)
     {
         //TODO: success_leds(s_mode);
     }
-    //TODO: update_leds(s_mode, s_press_index);
+    //TODO: update_leds(s_mode, s_press_count);
 }
