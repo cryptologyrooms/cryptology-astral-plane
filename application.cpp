@@ -12,19 +12,17 @@
 
 /* Application Includes */
 
+#include "application.h"
+#include "leds.h"
+
 /* Defines, typedefs, constants */
 
 #define N_BUTTONS 7
 
-typedef enum game_mode
-{
-    GAME_MODE_EASY,
-    GAME_MODE_EXPERT
-} GAME_MODE;
-
 /* Private Variables */
 
 static char s_press_record[N_BUTTONS+1] = "0000000";
+static bool s_pressed[N_BUTTONS] = {false};
 
 static uint8_t s_press_count = 0;
 
@@ -41,8 +39,12 @@ static void update_buttons(DebouncedInput * const pButtons[N_BUTTONS])
     {
         if (pButtons[i]->check_low_and_clear())
         {
-            button_count++;
-            button_pressed = '1' + i;
+            if (!s_pressed[i])
+            {
+                s_pressed[i] = true;
+                button_count++;
+                button_pressed = '1' + i;
+            }
         }
     }
 
@@ -89,29 +91,7 @@ void raat_custom_setup(const raat_devices_struct& devices, const raat_params_str
 {
     (void)params;
 
-    for(uint8_t i=0; i<7; i++)
-    {
-        devices.pLEDs->setPixelColor(i, 128,0,0);
-        devices.pLEDs->show();
-        delay(100);
-    } 
-
-    for(uint8_t i=0; i<7; i++)
-    {
-        devices.pLEDs->setPixelColor(i, 0,128,0);
-        devices.pLEDs->show();
-        delay(100);
-    } 
-
-    for(uint8_t i=0; i<7; i++)
-    {
-        devices.pLEDs->setPixelColor(i, 0,0,128);
-        devices.pLEDs->show();
-        delay(100);
-    }
-
-    devices.pLEDs->clear();
-    devices.pLEDs->show();
+    leds_play_intro(devices.pLEDs);
 }
 
 void raat_custom_loop(const raat_devices_struct& devices, const raat_params_struct& params)
@@ -122,7 +102,7 @@ void raat_custom_loop(const raat_devices_struct& devices, const raat_params_stru
     char to_match[N_BUTTONS+1];
     params.pButtonOrder->get(to_match);
    
-    uint8_t check_threshold = s_mode == GAME_MODE_EASY ? 3 : 6;
+    uint8_t check_threshold = s_mode == GAME_MODE_EASY ? 4 : 7;
 
     if (s_press_count >= check_threshold)
     {
@@ -134,14 +114,15 @@ void raat_custom_loop(const raat_devices_struct& devices, const raat_params_stru
                 to_match[s_press_count-1]
             );
             memset(s_press_record, '0', N_BUTTONS);
+            memset(s_pressed, false, N_BUTTONS);
             s_press_count = 0;
-            //TODO: fail_leds(s_mode);
+            leds_fail(devices.pLEDs, s_mode);
         }
     }
 
     if (s_press_count == N_BUTTONS)
     {
-        //TODO: success_leds(s_mode);
+        //TODO: leds_success(s_mode);
     }
-    //TODO: update_leds(s_mode, s_press_count);
+    leds_update(devices.pLEDs, s_mode, s_press_count);
 }

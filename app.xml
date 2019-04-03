@@ -46,6 +46,9 @@
 
     <custom_code>
         <file>application.cpp</file>
+        <file>application.h</file>
+        <file>leds.cpp</file>
+        <file>leds.h</file>
     </custom_code>
     
     <logging>
