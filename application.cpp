@@ -30,7 +30,17 @@ static GAME_MODE s_mode = (GAME_MODE)-1;
 
 /* Private Functions */
 
-static void update_buttons(DebouncedInput * const pButtons[N_BUTTONS])
+static void reset_game(const raat_devices_struct& devices)
+{
+    memset(s_press_record, '0', N_BUTTONS);
+    memset(s_pressed, false, N_BUTTONS);
+    s_press_count = 0;
+    devices.pMaglock->set(false);
+    leds_fail(devices.pLEDs);
+
+}
+
+static bool update_buttons(DebouncedInput * const pButtons[N_BUTTONS])
 {
     uint8_t button_count = 0;
     char button_pressed = '0';
@@ -52,10 +62,11 @@ static void update_buttons(DebouncedInput * const pButtons[N_BUTTONS])
     {
         s_press_record[s_press_count++] = button_pressed;
         raat_logln(LOG_APP, "Button %c pressed (count %d)", button_pressed, s_press_count);
-    } 
+    }
+    return button_pressed != '0';
 }
 
-static void update_mode(DebouncedInput * const pModeSwitch)
+static bool update_mode(DebouncedInput * const pModeSwitch)
 {
     GAME_MODE new_mode;
     if (pModeSwitch->state())
@@ -66,11 +77,16 @@ static void update_mode(DebouncedInput * const pModeSwitch)
     {
         new_mode = GAME_MODE_EXPERT;
     }
+
+    bool mode_change = new_mode != s_mode;
+
     if (new_mode != s_mode)
     {
         raat_logln(LOG_APP, "New mode: %s", new_mode == GAME_MODE_EASY ? "easy" : "expert");
         s_mode = new_mode;
     }
+
+    return mode_change;
 }
 
 static bool compare_buttons(char const * const to_match)
@@ -96,36 +112,36 @@ void raat_custom_setup(const raat_devices_struct& devices, const raat_params_str
 
 void raat_custom_loop(const raat_devices_struct& devices, const raat_params_struct& params)
 {
-    update_buttons(devices.pButtons);
-    update_mode(devices.pMode_Switch);
+    bool button_press = update_buttons(devices.pButtons);
+    bool mode_change = update_mode(devices.pMode_Switch);
 
     char to_match[N_BUTTONS+1];
     params.pButtonOrder->get(to_match);
-   
-    uint8_t check_threshold = s_mode == GAME_MODE_EASY ? 4 : 7;
 
-    if (s_press_count >= check_threshold)
+    if (button_press || mode_change)
     {
-        bool match_result = compare_buttons(to_match);
-        if (!match_result)
+        uint8_t check_threshold = s_mode == GAME_MODE_EASY ? 4 : 7;
+
+        if (s_press_count >= check_threshold)
         {
-            raat_logln(LOG_APP, "Incorrect press %c (expected %c)",
-                s_press_record[s_press_count-1],
-                to_match[s_press_count-1]
-            );
-            memset(s_press_record, '0', N_BUTTONS);
-            memset(s_pressed, false, N_BUTTONS);
-            s_press_count = 0;
-            leds_fail(devices.pLEDs);
+            bool match_result = compare_buttons(to_match);
+            if (!match_result)
+            {
+                raat_logln(LOG_APP, "Mo match, resetting game",
+                    s_press_record[s_press_count-1],
+                    to_match[s_press_count-1]
+                );
+                reset_game(devices);
+            }
         }
-    }
 
-    if (s_press_count == N_BUTTONS)
-    {
-        leds_success(devices.pLEDs);
-        devices.pMaglock->set(true);
-        while(true) {}
-    }
+        if (s_press_count == N_BUTTONS)
+        {
+            devices.pMaglock->set(true);
+            leds_success(devices.pLEDs);
+            while(true) {}
+        }
 
-    leds_update(devices.pLEDs, s_mode, s_press_count);
+        leds_update(devices.pLEDs, s_mode, s_press_count);
+    }
 }

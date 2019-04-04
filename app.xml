@@ -18,11 +18,6 @@
             <setting id="debounce_time" value="50"/>
             <setting id="pullup" value="true"/>
         </device>
-        <device name="Buttons" type="Debounced Input" count="7">
-            <setting id="pin" values="6|7|8|9|10|11|12"/>
-            <setting id="debounce_time" all_values="50"/>
-            <setting id="pullup" all_values="true"/>
-        </device>
         <device name="Maglock" type="Digital Output">
             <setting id="pin" value="2"/>
         </device>
@@ -30,6 +25,11 @@
             <setting id="pin" value="13"/>
             <setting id="ontime" value="500"/>
             <setting id="offtime" value="500"/>
+        </device>
+        <device name="Buttons" type="Debounced Input" count="7">
+            <setting id="pin" values="6|7|8|9|10|11|12"/>
+            <setting id="debounce_time" all_values="50"/>
+            <setting id="pullup" all_values="true"/>
         </device>
     </devices>
 
