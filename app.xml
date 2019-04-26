@@ -18,6 +18,11 @@
             <setting id="debounce_time" value="50"/>
             <setting id="pullup" value="true"/>
         </device>
+        <device name="Activate Switch" type="Debounced Input">
+            <setting id="pin" value="A1"/>
+            <setting id="debounce_time" value="50"/>
+            <setting id="pullup" value="true"/>
+        </device>
         <device name="Maglock" type="Digital Output">
             <setting id="pin" value="2"/>
         </device>
