@@ -112,36 +112,39 @@ void raat_custom_setup(const raat_devices_struct& devices, const raat_params_str
 
 void raat_custom_loop(const raat_devices_struct& devices, const raat_params_struct& params)
 {
-    bool button_press = update_buttons(devices.pButtons);
-    bool mode_change = update_mode(devices.pMode_Switch);
-
-    char to_match[N_BUTTONS+1];
-    params.pButtonOrder->get(to_match);
-
-    if (button_press || mode_change)
+    if (devices.pActivate_Switch.state())
     {
-        uint8_t check_threshold = s_mode == GAME_MODE_EASY ? 4 : 7;
+        bool button_press = update_buttons(devices.pButtons);
+        bool mode_change = update_mode(devices.pMode_Switch);
 
-        if (s_press_count >= check_threshold)
+        char to_match[N_BUTTONS+1];
+        params.pButtonOrder->get(to_match);
+
+        if (button_press || mode_change)
         {
-            bool match_result = compare_buttons(to_match);
-            if (!match_result)
+            uint8_t check_threshold = s_mode == GAME_MODE_EASY ? 4 : 7;
+
+            if (s_press_count >= check_threshold)
             {
-                raat_logln(LOG_APP, "Mo match, resetting game",
-                    s_press_record[s_press_count-1],
-                    to_match[s_press_count-1]
-                );
-                reset_game(devices);
+                bool match_result = compare_buttons(to_match);
+                if (!match_result)
+                {
+                    raat_logln(LOG_APP, "Mo match, resetting game",
+                        s_press_record[s_press_count-1],
+                        to_match[s_press_count-1]
+                    );
+                    reset_game(devices);
+                }
             }
-        }
 
-        if (s_press_count == N_BUTTONS)
-        {
-            devices.pMaglock->set(true);
-            leds_success(devices.pLEDs);
-            while(true) {}
-        }
+            if (s_press_count == N_BUTTONS)
+            {
+                devices.pMaglock->set(true);
+                leds_success(devices.pLEDs);
+                while(true) {}
+            }
 
-        leds_update(devices.pLEDs, s_mode, s_press_count);
+            leds_update(devices.pLEDs, s_mode, s_press_count);
+        }
     }
 }
