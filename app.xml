@@ -6,12 +6,13 @@
     </info>
 
     <defines>
+        <define>NLEDS 174</define>
     </defines>
 
     <devices>
         <device name="LEDs" type="Adafruit NeoPixel">
             <setting id="pin" value="5"/>
-            <setting id="npixels" value="7"/>
+            <setting id="npixels" value="NLEDS"/>
         </device>
         <device name="Mode Switch" type="Debounced Input">
             <setting id="pin" value="A0"/>
@@ -44,6 +45,51 @@
             <setting id="length" value="7"/>
             <setting id="use_eeprom" value="true"/>
         </parameter>
+        <parameter name="SegmentMapping" type="String">
+            <setting id="reset_value" value="1234567"/>
+            <setting id="length" value="7"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
+
+
+        <parameter name="EasyColour" type="EightBitRGB">
+            <setting id="r_default" value="0"/>
+            <setting id="g_default" value="32"/>
+            <setting id="b_default" value="0"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
+        <parameter name="ExpertColour" type="EightBitRGB">
+            <setting id="r_default" value="32"/>
+            <setting id="g_default" value="32"/>
+            <setting id="b_default" value="0"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
+
+        <parameter name="SuccessColour" type="EightBitRGB">
+            <setting id="r_default" value="0"/>
+            <setting id="g_default" value="32"/>
+            <setting id="b_default" value="0"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
+        <parameter name="FailColour" type="EightBitRGB">
+            <setting id="r_default" value="32"/>
+            <setting id="g_default" value="0"/>
+            <setting id="b_default" value="0"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
+
+        <parameter name="FlashCount" type="Integer">
+            <setting id="type" value="uint8_t"/>
+            <setting id="reset_value" value="3"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
+
+        <parameter name="FlashPersist" type="Integer">
+            <setting id="type" value="uint8_t"/>
+            <setting id="reset_value" value="10"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
+
     </parameters>
 
     <modules>
@@ -58,9 +104,10 @@
     
     <logging>
         <log_module>APPLICATION</log_module>
+        <log_module>LEDS</log_module>
     </logging>
 
-    <raat protocol="url" buffer_size="32">
+    <raat protocol="url" buffer_size="24">
     </raat>
     
 </board>

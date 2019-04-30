@@ -30,14 +30,15 @@ static GAME_MODE s_mode = (GAME_MODE)-1;
 
 /* Private Functions */
 
-static void reset_game(const raat_devices_struct& devices)
+static void reset_game(const raat_devices_struct& devices, const raat_params_struct& params)
 {
     memset(s_press_record, '0', N_BUTTONS);
     memset(s_pressed, false, N_BUTTONS);
     s_press_count = 0;
     devices.pMaglock->set(false);
-    leds_fail(devices.pLEDs);
-
+    leds_flash(devices.pLEDs, params.pFailColour,
+        500, params.pFlashCount->get()
+    );
 }
 
 static bool update_buttons(DebouncedInput * const pButtons[N_BUTTONS])
@@ -61,7 +62,7 @@ static bool update_buttons(DebouncedInput * const pButtons[N_BUTTONS])
     if ((button_count == 1) && (s_press_count < N_BUTTONS))
     {
         s_press_record[s_press_count++] = button_pressed;
-        raat_logln(LOG_APP, "Button %c pressed (count %d)", button_pressed, s_press_count);
+        raat_logln(LOG_APP, "Button %c press (count %d)", button_pressed, s_press_count);
     }
     return button_pressed != '0';
 }
@@ -82,7 +83,7 @@ static bool update_mode(DebouncedInput * const pModeSwitch)
 
     if (new_mode != s_mode)
     {
-        raat_logln(LOG_APP, "New mode: %s", new_mode == GAME_MODE_EASY ? "easy" : "expert");
+        raat_logln(LOG_APP, "Mode: %s", new_mode == GAME_MODE_EASY ? "easy" : "expert");
         s_mode = new_mode;
     }
 
@@ -106,13 +107,15 @@ static bool compare_buttons(char const * const to_match)
 void raat_custom_setup(const raat_devices_struct& devices, const raat_params_struct& params)
 {
     (void)params;
-
+    char mapping[8];
+    params.pSegmentMapping->get(mapping);
+    leds_set_mapping(mapping);
     leds_play_intro(devices.pLEDs);
 }
 
 void raat_custom_loop(const raat_devices_struct& devices, const raat_params_struct& params)
 {
-    if (devices.pActivate_Switch.state())
+    if ((s_press_count < N_BUTTONS) && devices.pActivate_Switch->state())
     {
         bool button_press = update_buttons(devices.pButtons);
         bool mode_change = update_mode(devices.pMode_Switch);
@@ -129,22 +132,32 @@ void raat_custom_loop(const raat_devices_struct& devices, const raat_params_stru
                 bool match_result = compare_buttons(to_match);
                 if (!match_result)
                 {
-                    raat_logln(LOG_APP, "Mo match, resetting game",
-                        s_press_record[s_press_count-1],
-                        to_match[s_press_count-1]
-                    );
-                    reset_game(devices);
+                    raat_logln(LOG_APP, "Mo match, rst");
+                    reset_game(devices, params);
                 }
             }
 
             if (s_press_count == N_BUTTONS)
             {
                 devices.pMaglock->set(true);
-                leds_success(devices.pLEDs);
-                while(true) {}
+                leds_flash(devices.pLEDs, params.pSuccessColour,
+                    500, params.pFlashCount->get()
+                );
+                devices.pLEDs->set_pixels(0, NLEDS-1, 
+                    params.pSuccessColour->get(eR),
+                    params.pSuccessColour->get(eG),
+                    params.pSuccessColour->get(eB)
+                );
+                devices.pLEDs->show();
+                delay(params.pFlashPersist->get()*1000);
+                devices.pLEDs->clear();
+                devices.pLEDs->show();
+                return;
             }
 
-            leds_update(devices.pLEDs, s_mode, s_press_count);
+            leds_update(devices.pLEDs, 
+                params.pEasyColour, params.pExpertColour,
+                s_mode, s_press_count);
         }
     }
 }
