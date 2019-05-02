@@ -119,13 +119,13 @@ void raat_custom_loop(const raat_devices_struct& devices, const raat_params_stru
     {
         bool button_press = update_buttons(devices.pButtons);
         bool mode_change = update_mode(devices.pMode_Switch);
-
+        uint8_t easy_mode_threshold = params.pEasyThreshold->get() + 1;
         char to_match[N_BUTTONS+1];
         params.pButtonOrder->get(to_match);
 
         if (button_press || mode_change)
         {
-            uint8_t check_threshold = s_mode == GAME_MODE_EASY ? 4 : 7;
+            uint8_t check_threshold = s_mode == GAME_MODE_EASY ? easy_mode_threshold : 7;
 
             if (s_press_count >= check_threshold)
             {

@@ -50,7 +50,11 @@
             <setting id="length" value="7"/>
             <setting id="use_eeprom" value="true"/>
         </parameter>
-
+        <parameter name="EasyThreshold" type="Integer">
+            <setting id="type" value="uint8_t"/>
+            <setting id="reset_value" value="3"/>
+            <setting id="use_eeprom" value="true"/>
+        </parameter>
 
         <parameter name="EasyColour" type="EightBitRGB">
             <setting id="r_default" value="0"/>
@@ -83,7 +87,6 @@
             <setting id="reset_value" value="3"/>
             <setting id="use_eeprom" value="true"/>
         </parameter>
-
         <parameter name="FlashPersist" type="Integer">
             <setting id="type" value="uint8_t"/>
             <setting id="reset_value" value="10"/>

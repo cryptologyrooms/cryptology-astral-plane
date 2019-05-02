@@ -65,17 +65,19 @@ static void flash(
     AdafruitNeoPixelRAAT * pLEDs, uint8_t r, uint8_t g, uint8_t b,
     uint16_t ms_delay, uint8_t count)
 {
-    pLEDs->clear();
-    pLEDs->show();
+    pLEDs->reset();
+
     delay(ms_delay);
     
     for (uint8_t i=0; i<count; i++)
     {
         pLEDs->set_pixels(0, NLEDS-1, r, g, b);
         pLEDs->show();
+
         delay(ms_delay);
-        pLEDs->clear();
-        pLEDs->show();
+        
+        pLEDs->reset();
+
         delay(ms_delay);
     }
 
@@ -93,9 +95,7 @@ void leds_play_intro(AdafruitNeoPixelRAAT * pLEDs)
 {
     delay(100);
     
-    pLEDs->clear();
-    pLEDs->show();
-    
+    pLEDs->reset();
 
     for(uint8_t i=0; i<7; i++)
     {
@@ -110,8 +110,7 @@ void leds_play_intro(AdafruitNeoPixelRAAT * pLEDs)
         delay(100);
     }
 
-    pLEDs->clear();
-    pLEDs->show();
+    pLEDs->reset();
 
 }
 
