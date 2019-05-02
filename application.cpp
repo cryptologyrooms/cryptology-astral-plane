@@ -115,7 +115,7 @@ void raat_custom_setup(const raat_devices_struct& devices, const raat_params_str
 
 void raat_custom_loop(const raat_devices_struct& devices, const raat_params_struct& params)
 {
-    if ((s_press_count < N_BUTTONS) && devices.pActivate_Switch->state())
+    if ((s_press_count < N_BUTTONS) && !devices.pActivate_Switch->state())
     {
         bool button_press = update_buttons(devices.pButtons);
         bool mode_change = update_mode(devices.pMode_Switch);
